@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "MySetting.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
