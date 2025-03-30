@@ -127,7 +127,9 @@ extension MainViewController: UICollectionViewDelegate {
         let sectionType = sectionList[indexPath.section]
         switch sectionType {
         case .mainImageList:
-            break
+            let item = viewModel.picList[indexPath.row]
+            let vc = DetailImageViewController(imageId: item.id)
+            self.navigationController?.pushViewController(vc, animated: true)
         case .emptyImageList:
             break
         }
