@@ -58,9 +58,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 extension SceneDelegate {
     private func makeRooViewController() -> UIViewController {
-
-        let config = UIImage.SymbolConfiguration(weight: .medium)
-
         let vc = MainViewController()
 
         let navigationController = UINavigationController(rootViewController: vc)
