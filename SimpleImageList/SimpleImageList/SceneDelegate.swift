@@ -62,14 +62,8 @@ extension SceneDelegate {
         let config = UIImage.SymbolConfiguration(weight: .medium)
 
         let vc = MainViewController()
-        let book = UIImage(systemName: "book", withConfiguration: config)
-        vc.tabBarItem = UITabBarItem(title: "picSum", image: book, tag: 0)
 
-        let mainTabBar = UITabBarController()
-        mainTabBar.setViewControllers([vc], animated: true)
-        mainTabBar.title = "MyImageList"
-
-        let navigationController = UINavigationController(rootViewController: mainTabBar)
+        let navigationController = UINavigationController(rootViewController: vc)
         navigationController.isNavigationBarHidden = true
         return navigationController
     }
