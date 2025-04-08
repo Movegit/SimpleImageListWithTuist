@@ -7,12 +7,28 @@
 
 import Foundation
 
-enum APIError: Error {
+enum APIError: Error, Equatable {
     case invalidURL
     case noData
     case decodingFailed
     case networkError(Error)
     case invalidStatusCode(Int)
+
+    static func == (lhs: APIError, rhs: APIError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidURL, .invalidURL),
+            (.noData, .noData),
+            (.decodingFailed, .decodingFailed):
+            return true
+        case (.networkError(let lhsError), .networkError(let rhsError)):
+            return (lhsError as NSError).domain == (rhsError as NSError).domain &&
+            (lhsError as NSError).code == (rhsError as NSError).code
+        case (.invalidStatusCode(let lhsCode), .invalidStatusCode(let rhsCode)):
+            return lhsCode == rhsCode
+        default:
+            return false
+        }
+    }
 }
 
 class APIHelperNoLibSample {
@@ -31,21 +47,25 @@ class APIHelperNoLibSample {
         headers: [String: Any]? = nil,
         completion: @escaping (Result<T, APIError>) -> Void
     ) {
-        var urlComponents = URLComponents(string: url)
-        
-        // GET 요청에 대한 쿼리 파라미터 추가
-        if method == .get, let queryParameters = queryParameters {
-            urlComponents?.queryItems = queryParameters.map {
-                URLQueryItem(name: $0.key, value: "\($0.value)")
-            }
-        }
-        
-        guard let url = urlComponents?.url else {
+        guard let components = URLComponents(string: url),
+              let finalURL = components.url,
+              let scheme = components.scheme,
+              !scheme.isEmpty,
+              let host = components.host,
+              !host.isEmpty else {
             completion(.failure(.invalidURL))
             return
         }
-        
-        var request = URLRequest(url: url)
+
+        var urlComponents = components
+        // GET 요청에 대한 쿼리 파라미터 추가
+        if method == .get, let queryParameters = queryParameters {
+            urlComponents.queryItems = queryParameters.map {
+                URLQueryItem(name: $0.key, value: "\($0.value)")
+            }
+        }
+
+        var request = URLRequest(url: finalURL)
         request.httpMethod = method.rawValue
         
         // 헤더 추가
@@ -146,20 +166,25 @@ class APIHelperNoLibSample {
         body: [String: Any]? = nil,
         headers: [String: Any]? = nil
     ) async throws -> T {
-        var urlComponents = URLComponents(string: url)
-        
-        // GET 요청에 대한 쿼리 파라미터 추가
-        if method == .get, let queryParameters = queryParameters {
-            urlComponents?.queryItems = queryParameters.map {
-                URLQueryItem(name: $0.key, value: "\($0.value)")
-            }
-        }
-        
-        guard let url = urlComponents?.url else {
+        guard let components = URLComponents(string: url),
+              let finalURL = components.url,
+              let scheme = components.scheme,
+              !scheme.isEmpty,
+              let host = components.host,
+              !host.isEmpty else {
             throw APIError.invalidURL
         }
         
-        var request = URLRequest(url: url)
+        var urlComponents = components
+
+        // GET 요청에 대한 쿼리 파라미터 추가
+        if method == .get, let queryParameters = queryParameters {
+            urlComponents.queryItems = queryParameters.map {
+                URLQueryItem(name: $0.key, value: "\($0.value)")
+            }
+        }
+
+        var request = URLRequest(url: finalURL)
         request.httpMethod = method.rawValue
         
         // 헤더 추가
