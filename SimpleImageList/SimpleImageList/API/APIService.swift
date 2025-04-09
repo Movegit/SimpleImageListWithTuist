@@ -48,7 +48,7 @@ class APIHelperNoLibSample {
         completion: @escaping (Result<T, APIError>) -> Void
     ) {
         guard let components = URLComponents(string: url),
-              let finalURL = components.url,
+              let url = components.url,
               let scheme = components.scheme,
               !scheme.isEmpty,
               let host = components.host,
@@ -63,6 +63,11 @@ class APIHelperNoLibSample {
             urlComponents.queryItems = queryParameters.map {
                 URLQueryItem(name: $0.key, value: "\($0.value)")
             }
+        }
+
+        guard let finalURL = urlComponents.url else {
+            completion(.failure(.invalidURL))
+            return
         }
 
         var request = URLRequest(url: finalURL)
@@ -167,7 +172,7 @@ class APIHelperNoLibSample {
         headers: [String: Any]? = nil
     ) async throws -> T {
         guard let components = URLComponents(string: url),
-              let finalURL = components.url,
+              let url = components.url,
               let scheme = components.scheme,
               !scheme.isEmpty,
               let host = components.host,
@@ -182,6 +187,10 @@ class APIHelperNoLibSample {
             urlComponents.queryItems = queryParameters.map {
                 URLQueryItem(name: $0.key, value: "\($0.value)")
             }
+        }
+
+        guard let finalURL = urlComponents.url else {
+            throw APIError.invalidURL
         }
 
         var request = URLRequest(url: finalURL)
